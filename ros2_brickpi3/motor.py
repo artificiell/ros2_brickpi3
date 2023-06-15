@@ -27,7 +27,7 @@ class MotorController(Node):
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.
         port = self.get_parameter('port').value
         if port == 'A':
-            self.port = self.brick.PORT_B
+            self.port = self.brick.PORT_A
         if port == 'B':
             self.port = self.brick.PORT_B
         elif port == 'C':
