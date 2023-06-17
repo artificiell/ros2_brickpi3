@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "motor = ros2_brickpi3.motor:main"
+            "motor = ros2_brickpi3.motor:main",
+            "gyro = ros2_brickpi3.gyro:main"
         ],
     },
 )

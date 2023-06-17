@@ -1,7 +1,6 @@
 #!/usr/bin/env python3 
 import rclpy
 from rclpy.node import Node
-
 from std_msgs.msg import Int32
 
 import brickpi3
@@ -23,7 +22,7 @@ class MotorController(Node):
         # Declare port parameter
         self.declare_parameter('port', 'A')
 
-        # Setup BrickPi3
+        # Init BrickPi3 and set up motor port
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.
         port = self.get_parameter('port').value
         if port == 'A':
@@ -45,8 +44,7 @@ class MotorController(Node):
             speed = -100
         self.brick.set_motor_power(self.port, speed)
 
-    def stop(self):
-        self.brick.set_motor_power(self.port, 0)
+    def reset(self):
         self.brick.reset_all()
         
 
@@ -62,7 +60,7 @@ def main(args = None):
         pass
         
     # Stop the motor and destroy the node (explicitly)
-    motor_controller.stop()
+    motor_controller.reset()
     motor_controller.destroy_node()
     rclpy.shutdown()
 
