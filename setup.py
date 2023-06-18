@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             "motor = ros2_brickpi3.motor:main",
-            "gyro = ros2_brickpi3.gyro:main"
+            "gyro = ros2_brickpi3.gyro:main",
+            "touch = ros2_brickpi3.touch:main"
         ],
     },
 )
