@@ -100,17 +100,17 @@ _None_
 
 ### `motor.py`
 
-This ROS2 node serves as a controller for controlling an EV3 motor using the BrickPi3 library. It subscribes to the "speed" topic and adjusts the motor speed accordingly.
+This ROS 2 node serves as a controller for handling EV3 Motor commands using the BrickPi3 library. It receives speed commands on the `speed` topic and controls the motor accordingly. Positive values indicate forward motion, negative values indicate backward motion, and zero stops the motor. This node further reads the motor encoder value and publishes it on the `encoder` topic.
 
-#### Subscribed Topics
+### Subscribed Topics
 
-- **`speed`** (`std_msgs/Int32`): The desired speed of the motor is received through this topic as an integer value. Positive values represent forward motion, while negative values represent backward motion. The range of values is from -100 to 100, where -100 corresponds to full speed backward and 100 corresponds to full speed forward.
+- **`speed`** (`std_msgs/Int32`): This topic receives speed commands for controlling the motor. The speed command should be an integer value representing the desired speed of the motor in _Degrees Per Second_ (DPS). Positive values indicate forward motion, negative values indicate backward motion, and zero stops the motor.
 
-#### Published Topics
+### Published Topics
 
-_None_
+- **`encoder`** (`std_msgs/Int32`): This topic publishes the current encoder value of the motor. The encoder value is an integer that represents the position or rotation of the motor.
 
-#### Parameters
+### Parameters
 
 - **`port`** (string, default: 'A'): The output port on the BrickPi3 where the motor is connected. Valid options are 'A', 'B', 'C', and 'D'.
 
