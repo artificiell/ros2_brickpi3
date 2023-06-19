@@ -20,9 +20,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "motor = ros2_brickpi3.motor:main",
+            "color = ros2_brickpi3.color:main",
             "gyro = ros2_brickpi3.gyro:main",
-            "touch = ros2_brickpi3.touch:main"
+            "motor = ros2_brickpi3.motor:main",
+            "touch = ros2_brickpi3.touch:main",
+            "ultrasonic = ros2_brickpi3.ultrasonic:main"
         ],
     },
 )
