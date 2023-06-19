@@ -34,7 +34,7 @@ class ColorSensor(Node):
         self.timer = self.create_timer(timer_period, self.callback)
         self.colors = ["unknown", "black", "blue", "green", "yellow", "red", "white", "brown"]
 
-    # Read and publish sesnor value
+    # Read and publish sensor value
     def callback(self):
         try:
             val = self.brick.get_sensor(self.port)

@@ -33,7 +33,7 @@ class UltrasonicSensor(Node):
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
 
-    # Read and publish sesnor value
+    # Read and publish sensor value
     def callback(self):
         try:
             msg = Float32()

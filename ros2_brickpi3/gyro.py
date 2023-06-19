@@ -35,7 +35,7 @@ class GyroSensor(Node):
         self.timer = self.create_timer(timer_period, self.callback)
         self.last_val = None
 
-    # Read and publish sesnor value
+    # Read and publish sensor value
     def callback(self):
         try:
             this_val = self.brick.get_sensor(self.port)
