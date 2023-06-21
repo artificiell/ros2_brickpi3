@@ -36,7 +36,7 @@ class MotorController(Node):
         self.get_logger().info(f"Motor ouput port: {port}")
         #self.brick.set_motor_power(self.port, self.brick.MOTOR_FLOAT)  # float motor
         self.brick.reset_motor_encoder(self.port) 
-        self.limit = 200
+        self.limit = 1000
 
         # Setup ROS publisher
         self.publisher_ = self.create_publisher(Int32, 'encoder', 10)
