@@ -43,6 +43,7 @@ class ColorSensor(Node):
             self.publisher_.publish(msg)
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Color sensor: {e}", throttle_duration_sec = 1)
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
 
     # Reset all sensor ports
     def reset(self):

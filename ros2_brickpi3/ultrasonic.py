@@ -41,6 +41,7 @@ class UltrasonicSensor(Node):
             self.publisher_.publish(msg)
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Ultrasonic sensor: {e}", throttle_duration_sec = 1)
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_ULTRASONIC_CM)
 
     # Reset all sensor ports
     def reset(self):

@@ -28,22 +28,25 @@ class GyroSensor(Node):
             self.port = self.brick.PORT_4
         self.get_logger().info(f"Gyro sensor input port: {port}")
         self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_GYRO_ABS_DPS)
+        self.offset = None
         
         # Setup ROS publisher
         self.publisher_ = self.create_publisher(Float32, 'rotation', 10)
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
-        self.last_val = None
+        self.last_val = self.brick.get_sensor(self.port)
 
     # Read and publish sensor value
     def callback(self):
         try:
             this_val = self.brick.get_sensor(self.port)
+            if self.offset is None:
+                self.offset = this_val
             if self.last_val is None:
                 self.last_val = this_val
             else:
                 if this_val[0] == 0 and abs(this_val[0] - self.last_val[0]) > 3:
-                    this_val[0] = self.last_val[0]
+                    this_val[0] = self.last_val[0] - self.offset[0]
             msg = Float32()
             msg.data = -this_val[0] * np.pi / 180.0
             while msg.data < -np.pi * 2.:
@@ -58,6 +61,7 @@ class GyroSensor(Node):
             self.last_val = this_val
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Gyro sensor: {e}", throttle_duration_sec = 1)
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_GYRO_ABS_DPS)
 
     # Reset all sensor ports
     def reset(self):
