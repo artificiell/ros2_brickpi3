@@ -97,7 +97,7 @@ This ROS 2 node is a handler for the EV3 Touch sensor inputs using the BrickPi3 
 
 ### Ultrasonic Sensor (`ultrasonic.py`)
 
-This ROS 2 node serves as a handler for the EV3 Ultrasonic sensor inputs using the BrickPi3 library. The node uses the BrickPi3 library to communicate with the ultrasonic sensor and read the distance measurement. It reads the distance measured by the ultrasonic sensor and publishes it as a floating-point value.
+This ROS 2 node is a handler for the EV3 Ultrasonic sensor inputs using the BrickPi3 library. The node uses the BrickPi3 library to communicate with the ultrasonic sensor and read the distance measurement. It reads the distance measure by the ultrasonic sensor and publishes it as a floating-point value.
 
 #### Published Topics
 
@@ -121,6 +121,40 @@ This ROS 2 node serves as a controller for handling EV3 Motor commands using the
 #### Parameters
 
 - **`port`** (string, default: 'A'): The output port on the BrickPi3 where the motor is connected. Valid options are 'A', 'B', 'C', and 'D'.
+
+
+### Differential Drive Controller(`drive.py`)
+
+This ROS 2 node implements a differential drive controller for a mobile robot. It receives movement commands and publishes speed messages to control the left and right motors. Additionally, it calculates and publishes odometry readings based on the motor encoder values.
+
+#### Subscribed Topics
+
+- **`cmd`** (`geometry_msgs/Twist`): The movement command for the robot. It contains linear and angular velocities.
+- **`left/encoder`** (`std_msgs/Int32`): The encoder value of the left motor. It provides information about the position of the left motor.
+- **`right/encoder`** (`std_msgs/Int32`): The encoder value of the right motor. It provides information about the position of the right motor.
+
+#### Published Topics
+
+- **`left/speed`** (`std_msgs/Int32`): The speed message to control the left motor. The value represents the speed in degrees per second (DPS).
+- **`right/speed`** (`std_msgs/Int32`): The speed message to control the right motor. The value represents the speed in degrees per second (DPS).
+- **`odom`** (`nav_msgs/Odometry`): The odometry readings of the robot. It provides information about the position and orientation of the robot, as well as linear and angular velocities.
+
+#### Parameters
+
+- **`wheel_radius`** (float, default: 0.0275): The radius of the wheels in meters.
+- **`base_distance`** (float, default: 0.075): The distance between the two wheels (base) in meters.
+
+#### Node Behavior
+- Upon receiving a movement command (`cmd`), the node calculates the required left and right motor speeds to achieve the desired linear and angular velocities.
+- The calculated speeds are published as speed messages to the respective motor topics (`left/speed` and `right/speed`).
+- The node continuously listens to the motor encoder topics (`left/encoder` and `right/encoder`) to receive the updated encoder values.
+- Periodically, the node calculates the odometry readings based on the motor encoder values, including the distance traveled, orientation, and velocity.
+- The odometry readings are published as `nav_msgs/Odometry` messages on the `odom` topic
+
+#### Troubleshooting
+
+- If the robot is not moving as expected, verify that the wheel radius and base distance parameters are set correctly for your robot.
+- Ensure that the motor encoder topics (`left/encoder` and `right/encoder`) publish the correct encoder values.
 
 
 ## License
