@@ -30,10 +30,10 @@ def generate_launch_description():
         package = 'ros2_brickpi3',
         namespace = robot_ns,
         executable = 'motor',
-        name = 'left_motor_node',
-        parameters=[
-            {'port': LaunchConfiguration('left_motor_port')}
-        ],      
+        name = 'left_motor_controller',
+        parameters=[{
+            'port': LaunchConfiguration('left_motor_port')
+        }],      
         remappings=[
             ('speed', 'left/speed'),
             ('encoder', 'left/encoder'),
@@ -45,10 +45,10 @@ def generate_launch_description():
         package = 'ros2_brickpi3',
         namespace = robot_ns,
         executable = 'motor',
-        name = 'right_motor_node',
-        parameters=[
-            {'port': LaunchConfiguration('right_motor_port')}
-        ],      
+        name = 'right_motor_controller',
+        parameters=[{
+            'port': LaunchConfiguration('right_motor_port')
+        }],      
         remappings=[
             ('speed', 'right/speed'),
             ('encoder', 'right/encoder'),
