@@ -45,10 +45,10 @@ class ColorSensor(Node):
             self.get_logger().error(f"Color sensor: {e}", throttle_duration_sec = 1)
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
 
-    # Reset all sensor ports
+    # Reset sensor port
     def reset(self):
-        self.brick.reset_all()
-
+        self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
+ 
                                                                                                                                     
 # Main function
 def main(args = None):

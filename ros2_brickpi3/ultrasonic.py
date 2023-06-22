@@ -45,7 +45,7 @@ class UltrasonicSensor(Node):
 
     # Reset all sensor ports
     def reset(self):
-        self.brick.reset_all()
+        self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
 
                                                                                                                                     
 # Main function

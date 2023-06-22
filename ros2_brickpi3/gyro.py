@@ -34,8 +34,8 @@ class GyroSensor(Node):
         self.publisher_ = self.create_publisher(Float32, 'rotation', 10)
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
-        self.last_val = self.brick.get_sensor(self.port)
-
+        self.last_val = None
+        
     # Read and publish sensor value
     def callback(self):
         try:
@@ -49,24 +49,16 @@ class GyroSensor(Node):
                     this_val[0] = self.last_val[0] - self.offset[0]
             msg = Float32()
             msg.data = -this_val[0] * np.pi / 180.0
-            while msg.data < -np.pi * 2.:
-                msg.data += np.pi * 2.
-            while msg.data > np.pi * 2.:
-                msg.data -= np.pi * 2.
-            if msg.data > np.pi:
-                msg.data =  (msg.data - np.pi) - np.pi
-            if msg.data < -np.pi:
-                msg.data =  np.pi + (msg.data + np.pi)
             self.publisher_.publish(msg)
             self.last_val = this_val
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Gyro sensor: {e}", throttle_duration_sec = 1)
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_GYRO_ABS_DPS)
 
-    # Reset all sensor ports
+    # Reset sensor port
     def reset(self):
-        self.brick.reset_all()
-
+        self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
+ 
                                                                                                                                     
 # Main function
 def main(args = None):

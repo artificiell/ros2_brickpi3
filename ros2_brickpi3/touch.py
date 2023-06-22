@@ -43,9 +43,9 @@ class TouchSensor(Node):
             self.get_logger().error(f"Touch sensor: {e}", throttle_duration_sec = 1)
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.TOUCH)
 
-    # Reset all sensor ports
+    # Reset sensor port
     def reset(self):
-        self.brick.reset_all()
+        self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
 
                                                                                                                                     
 # Main function

@@ -11,14 +11,6 @@ class MotorController(Node):
     def __init__(self):
         super().__init__('lego_motor_controller')
 
-        # Setup ROS subscriber
-        self.subscription = self.create_subscription(
-            Int32,
-            'speed',
-            self.speed_callback,
-            10
-        )
-
         # Declare port parameter
         self.declare_parameter('port', 'A')
 
@@ -40,6 +32,14 @@ class MotorController(Node):
 
         # Setup ROS publisher
         self.publisher_ = self.create_publisher(Int32, 'encoder', 10)
+
+        # Setup ROS subscriber
+        self.subscription = self.create_subscription(
+            Int32,
+            'speed',
+            self.speed_callback,
+            10
+        )
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.encoder_callback)
 
@@ -66,11 +66,12 @@ class MotorController(Node):
     # Reset all motor ports
     def stop(self):
         try:
-            self.brick.set_motor_dps(self.port, 0) 
+            self.brick.set_motor_dps(self.port, 0)
+            self.brick.reset_motor_encoder(self.port)
         except IOError as e:
             self.get_logger().error(f"Motor controller: {e}", throttle_duration_sec = 1)
         finally:
-            self.brick.reset_all()
+            self.brick.set_motor_power(self.port, self.brick.MOTOR_FLOAT)
         
 
 # Main function
