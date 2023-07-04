@@ -32,7 +32,7 @@ class GyroSensor(Node):
         
         # Setup ROS publisher
         self.publisher_ = self.create_publisher(Float32, 'rotation', 10)
-        timer_period = 0.05  # seconds
+        timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
         self.last_val = None
         
@@ -49,6 +49,14 @@ class GyroSensor(Node):
                     this_val[0] = self.last_val[0] - self.offset[0]
             msg = Float32()
             msg.data = -this_val[0] * np.pi / 180.0
+            while msg.data < -np.pi * 2.:
+                msg.data += np.pi * 2.
+            while msg.data > np.pi * 2.:
+                msg.data -= np.pi * 2.
+            if msg.data > np.pi:
+                msg.data =  (msg.data - np.pi) - np.pi
+            if msg.data < -np.pi:
+                msg.data =  np.pi + (msg.data + np.pi)
             self.publisher_.publish(msg)
             self.last_val = this_val
         except brickpi3.SensorError as e:
