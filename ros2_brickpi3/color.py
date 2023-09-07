@@ -38,9 +38,10 @@ class ColorSensor(Node):
     def callback(self):
         try:
             val = self.brick.get_sensor(self.port)
-            msg = String()
-            msg.data = self.colors[val]
-            self.publisher_.publish(msg)
+            if val >= 0 and val < len(self.colors):
+                msg = String()
+                msg.data = self.colors[val]
+                self.publisher_.publish(msg)
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Color sensor: {e}", throttle_duration_sec = 1)
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
