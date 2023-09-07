@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             "color = ros2_brickpi3.color:main",
             "drive = ros2_brickpi3.drive:main",
+            "eyes = ros2_brickpi3.eyes:main",
             "gyro = ros2_brickpi3.gyro:main",
             "motor = ros2_brickpi3.motor:main",
             "touch = ros2_brickpi3.touch:main",
