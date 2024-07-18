@@ -29,11 +29,11 @@ source install/setup.bash
 
 ## Usage
 
-To use any of the LEGO Sensor ROS 2 nodes, follow these steps:
+To use any of the LEGO Sensor nodes, follow these steps:
 
 1. Connect the sensor to the desired **sensor** port on the BrickPi3.
 
-2. Launch the node, e.g., for the  LEGO Color Sensor:
+2. Run the node, e.g., for the  LEGO Color Sensor:
 ```
 ros2 run ros2_brickpi3 color --ros-args -p port:=1
 ```
@@ -42,11 +42,11 @@ ros2 run ros2_brickpi3 color --ros-args -p port:=1
 ros2 topic echo /color
 ```
 
-To use the LEGO Motor Controller ROS 2 node, follow these steps:
+To use the LEGO Motor Controller node, follow these steps:
 
 1. Connect an EV3 motor to the desired **motor** port on the BrickPi3.
 
-2. Launch the node:
+2. Run the node:
 ```
 ros2 run ros2_brickpi3 motor --ros-args -p port:=A
 ```
@@ -60,6 +60,15 @@ ros2 topic pub speed std_msgs/Int32 "{data: 10}"
 ```
 ros2 topic pub speed std_msgs/Int32 "{data: 0}"
 ```
+
+In addition, to similtaniously use the LEGO Motor Controller node, follow these steps: 
+```
+ros2 launch ros2_brickpi3 motors.launch.py
+
+```
+
+This **launch** file will run two LEGO Motor Controller nodes and **remap** the topic namespace of each motor node to "left" and "right", respectively.
+ 
 
 ## Sensor Nodes
 
