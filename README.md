@@ -61,13 +61,13 @@ ros2 topic pub speed std_msgs/Int32 "{data: 10}"
 ros2 topic pub speed std_msgs/Int32 "{data: 0}"
 ```
 
-In addition, to similtaniously use the LEGO Motor Controller node, follow these steps: 
+In addition, to simultaneously run two LEGO Motor Controller nodes, use the following launch file:
 ```
 ros2 launch ros2_brickpi3 motors.launch.py
 
 ```
 
-This **launch** file will run two LEGO Motor Controller nodes and **remap** the topic namespace of each motor node to "left" and "right", respectively.
+This launch file will run two LEGO Motor Controller nodes and **remap** the topic namespace of each motor node to "left" and "right", respectively.
  
 
 ## Sensor Nodes
