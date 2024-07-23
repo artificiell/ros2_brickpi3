@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Int16, String
 
 import brickpi3
 
@@ -11,11 +11,13 @@ class ColorSensor(Node):
     def __init__(self):
         super().__init__('lego_color_sensor')
 
-        # Declare port parameter
+        # Declare mode and port parameters
+        self.declare_parameter('mode', 'color')
         self.declare_parameter('port', 1)
         
-        # Init BrickPi3 instance and set up sensor port
+        # Initialize BrickPi3 instance and set up sensor port
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.
+        self.mode = self.get_parameter('mode').value
         port = self.get_parameter('port').value
         if port == 1:
             self.port = self.brick.PORT_1
@@ -26,25 +28,42 @@ class ColorSensor(Node):
         elif port == 4:
             self.port = self.brick.PORT_4
         self.get_logger().info(f"Color sensor input port: {port}")
-        self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
-        
+        self.get_logger().info(f"Color sensor mode: {self.mode}")
+        self.init() # Initialize sensor
+          
         # Setup ROS publisher
-        self.publisher_ = self.create_publisher(String, 'color', 10)
+        if self.mode == 'ambient' or self.mode == 'reflected':
+            self.publisher_ = self.create_publisher(Int16, 'color', 10)
+        else:
+            self.publisher_ = self.create_publisher(String, 'color', 10)
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
         self.colors = ["unknown", "black", "blue", "green", "yellow", "red", "white", "brown"]
 
+    # Initialize sensor according to sensor mode
+    def init(self):
+        if self.mode == 'ambient':
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_AMBIENT)
+        elif self.mode == 'reflected':
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_REFLECTED)
+        else:
+            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
+        
     # Read and publish sensor value
     def callback(self):
         try:
             val = self.brick.get_sensor(self.port)
-            if val >= 0 and val < len(self.colors):
+            if self.mode == 'color' and val >= 0 and val < len(self.colors):
                 msg = String()
                 msg.data = self.colors[val]
                 self.publisher_.publish(msg)
+            else:
+                msg = Int16()
+                msg.data = val
+                self.publisher_.publish(msg)
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Color sensor: {e}", throttle_duration_sec = 1)
-            self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
+            self.init() # Re-initialize sensor
 
     # Reset sensor port
     def reset(self):
