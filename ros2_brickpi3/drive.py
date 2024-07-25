@@ -4,6 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import Int32
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+
 import numpy as np
 
 #  Class for handle Differential drive
@@ -54,7 +55,6 @@ class DifferentialDrive(Node):
         # Setup timed subscriber
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.odom_callback)
-
         
     # Receive and process movement commands, send speed messages to motors
     def cmd_callback(self, msg):
@@ -77,7 +77,6 @@ class DifferentialDrive(Node):
         right_msg.data = int(right_speed)        
         self.left_motor_publisher_.publish(left_msg)
         self.right_motor_publisher_.publish(right_msg)
-
         
     # Periodically send odometry readings
     def odom_callback(self):
@@ -121,7 +120,6 @@ class DifferentialDrive(Node):
             odom.twist.twist.linear.y = 0.0
             odom.twist.twist.angular.z = th / elapsed # Angular velocity
             self.odom_publisher_.publish(odom)
-
     
     # Receive and store left motor encoder value
     def left_encoder_callback(self, msg):
@@ -135,9 +133,7 @@ class DifferentialDrive(Node):
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     diff_drive = DifferentialDrive()
-
     try:
         rclpy.spin(diff_drive)
     except KeyboardInterrupt:

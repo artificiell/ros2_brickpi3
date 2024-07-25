@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
+import atexit
 import brickpi3
 import json
 
@@ -45,12 +46,14 @@ class EyesSensor(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
 
+        # Register reset method 
+        atexit.register(self.reset)
+        
     # Set SumoEyes sensor input mode
     def set_mode(self, val):
         mode = [(self.brick.SENSOR_CUSTOM.PIN1_ADC | val)]
         self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.CUSTOM, mode)
-        
-        
+                
     # Read and publish sensor value
     def callback(self):
         try:
@@ -86,16 +89,13 @@ class EyesSensor(Node):
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     eyes_sensor = EyesSensor()
-
     try:
         rclpy.spin(eyes_sensor)
     except KeyboardInterrupt:
         pass
         
-    # Stop the sensor and destroy the node (explicitly)
-    eyes_sensor.reset()
+    # Destroy the node (explicitly)
     eyes_sensor.destroy_node()
     rclpy.shutdown()
 

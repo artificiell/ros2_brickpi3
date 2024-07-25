@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int16, String
 
+import atexit
 import brickpi3
 
 # Class for handle EV3 Color sensor inputs
@@ -40,6 +41,9 @@ class ColorSensor(Node):
         self.timer = self.create_timer(timer_period, self.callback)
         self.colors = ["unknown", "black", "blue", "green", "yellow", "red", "white", "brown"]
 
+        # Register reset method 
+        atexit.register(self.reset)
+        
     # Initialize sensor according to sensor mode
     def init(self):
         if self.mode == 'ambient':
@@ -48,7 +52,7 @@ class ColorSensor(Node):
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_REFLECTED)
         else:
             self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_COLOR_COLOR)
-        
+            
     # Read and publish sensor value
     def callback(self):
         try:
@@ -64,25 +68,22 @@ class ColorSensor(Node):
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Color sensor: {e}", throttle_duration_sec = 1)
             self.init() # Re-initialize sensor
-
+            
     # Reset sensor port
     def reset(self):
         self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
- 
-                                                                                                                                    
+
+        
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     color_sensor = ColorSensor()
-
     try:
         rclpy.spin(color_sensor)
     except KeyboardInterrupt:
         pass
         
-    # Stop the sensor and destroy the node (explicitly)
-    color_sensor.reset()
+    # Destroy the node (explicitly)
     color_sensor.destroy_node()
     rclpy.shutdown()
 

@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
 
+import atexit
 import brickpi3
 
 # Class for handle EV3 Ultrasonic sensor inputs
@@ -33,6 +34,9 @@ class UltrasonicSensor(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
 
+        # Register reset method 
+        atexit.register(self.reset)
+
     # Read and publish sensor value
     def callback(self):
         try:
@@ -51,16 +55,13 @@ class UltrasonicSensor(Node):
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     ultrasonic_sensor = UltrasonicSensor()
-
     try:
         rclpy.spin(ultrasonic_sensor)
     except KeyboardInterrupt:
         pass
         
-    # Stop the sensor and destroy the node (explicitly)
-    ultrasonic_sensor.reset()
+    # Destroy the node (explicitly)
     ultrasonic_sensor.destroy_node()
     rclpy.shutdown()
 

@@ -3,9 +3,10 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int32
 
+import atexit
 import brickpi3
 
-# Controller for handle EV3 Motor commands
+# Class for handle EV3 Motor commands
 class MotorController(Node):
 
     def __init__(self):
@@ -26,7 +27,6 @@ class MotorController(Node):
         elif port == 'D':
             self.port = self.brick.PORT_D
         self.get_logger().info(f"Motor ouput port: {port}")
-        #self.brick.set_motor_power(self.port, self.brick.MOTOR_FLOAT)  # float motor
         self.brick.reset_motor_encoder(self.port) 
         self.limit = 1000
 
@@ -43,6 +43,8 @@ class MotorController(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.encoder_callback)
 
+        # Register reset method 
+        atexit.register(self.reset)
 
     # Write and set motor speed
     def speed_callback(self, msg):
@@ -52,7 +54,7 @@ class MotorController(Node):
             speed = -self.limit if speed < -self.limit else speed
             self.brick.set_motor_dps(self.port, speed) 
         except IOError as e:
-            self.get_logger().error(f"Motor controller: {e}", throttle_duration_sec = 1)
+            self.get_logger().error(f"Motor speed: {e}", throttle_duration_sec = 1)
 
     # Read and publish motor encoder value
     def encoder_callback(self):
@@ -61,15 +63,15 @@ class MotorController(Node):
             msg.data = self.brick.get_motor_encoder(self.port)
             self.publisher_.publish(msg)
         except IOError as e:
-            self.get_logger().error(f"Motor controller: {e}", throttle_duration_sec = 1)
+            self.get_logger().error(f"Motor encoder: {e}", throttle_duration_sec = 1)
 
     # Reset all motor ports
-    def stop(self):
+    def reset(self):
         try:
             self.brick.set_motor_dps(self.port, 0)
             self.brick.reset_motor_encoder(self.port)
         except IOError as e:
-            self.get_logger().error(f"Motor controller: {e}", throttle_duration_sec = 1)
+            self.get_logger().error(f"Motor reset: {e}", throttle_duration_sec = 1)
         finally:
             self.brick.set_motor_power(self.port, self.brick.MOTOR_FLOAT)
         
@@ -77,16 +79,13 @@ class MotorController(Node):
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     motor_controller = MotorController()
-
     try:
         rclpy.spin(motor_controller)
     except KeyboardInterrupt:
         pass
         
-    # Stop the motor and destroy the node (explicitly)
-    motor_controller.stop()
+    # Destroy the node (explicitly)
     motor_controller.destroy_node()
     rclpy.shutdown()
 

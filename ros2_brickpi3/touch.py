@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool
 
+import atexit
 import brickpi3
 
 # Class for handle EV3 Touch sensor inputs
@@ -33,6 +34,9 @@ class TouchSensor(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
 
+        # Register reset method 
+        atexit.register(self.reset)
+
     # Read and publish sensor value
     def callback(self):
         try:
@@ -59,8 +63,7 @@ def main(args = None):
     except KeyboardInterrupt:
         pass
         
-    # Stop the sensor and destroy the node (explicitly)
-    touch_sensor.stop()
+    # Destroy the node (explicitly)
     touch_sensor.destroy_node()
     rclpy.shutdown()
 

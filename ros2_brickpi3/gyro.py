@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
 
+import atexit
 import brickpi3
 import numpy as np
 
@@ -34,6 +35,9 @@ class GyroSensor(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
         self.last_val = None
+
+        # Register reset method 
+        atexit.register(self.reset)
         
     # Read and publish sensor value
     def callback(self):
@@ -60,7 +64,7 @@ class GyroSensor(Node):
             
         except brickpi3.SensorError as e:
             self.get_logger().error(f"Gyro sensor: {e}", throttle_duration_sec = 1)
-
+            
     # Reset sensor port
     def reset(self):
         self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.NONE)
@@ -69,16 +73,13 @@ class GyroSensor(Node):
 # Main function
 def main(args = None):
     rclpy.init(args = args)
-
     gyro_sensor = GyroSensor()
-
     try:
         rclpy.spin(gyro_sensor)
     except KeyboardInterrupt:
         pass
         
-    # Stop the sensor and destroy the node (explicitly)
-    gyro_sensor.reset()
+    # Destroy the node (explicitly)
     gyro_sensor.destroy_node()
     rclpy.shutdown()
 
