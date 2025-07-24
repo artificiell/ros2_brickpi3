@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_default, qos_profile_sensor_data
 from std_msgs.msg import Int32
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -21,28 +22,28 @@ class DifferentialDrive(Node):
         self.ticks_per_meter = 1.0 / (2 * np.pi * self.r) * 360
         
         # Setup ROS publishers
-        self.left_motor_publisher_ = self.create_publisher(Int32, 'left/speed', 10)
-        self.right_motor_publisher_ = self.create_publisher(Int32, 'right/speed', 10)
-        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', 10)
+        self.left_motor_publisher_ = self.create_publisher(Int32, 'left/speed', qos_profile_default)
+        self.right_motor_publisher_ = self.create_publisher(Int32, 'right/speed', qos_profile_default)
+        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
 
         # Setup ROS subscribers
         self.cmd_subscription = self.create_subscription(
             Twist,
             'cmd',
             self.cmd_callback,
-            10
+            qos_profile_default
         )
         self.left_encoder_subscription = self.create_subscription(
             Int32,
             'left/encoder',
             self.left_encoder_callback,
-            10
+            qos_profile_sensor_data
         )
         self.right_encoder_subscription = self.create_subscription(
             Int32,
             'right/encoder',
             self.right_encoder_callback,
-            10
+            qos_profile_sensor_data
         )
 
         # Encoder and position variables

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_default, qos_profile_sensor_data
 from std_msgs.msg import Float32
 
 import atexit
@@ -14,6 +15,7 @@ class UltrasonicSensor(Node):
 
         # Declare port parameter
         self.declare_parameter('port', 1)
+        self.declare_parameter('profile', 'best_effort') # QoS profile: best_effort or reliable
         
         # Init BrickPi3 instance and set up sensor port
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.
@@ -30,7 +32,12 @@ class UltrasonicSensor(Node):
         self.brick.set_sensor_type(self.port, self.brick.SENSOR_TYPE.EV3_ULTRASONIC_CM)
         
         # Setup ROS publisher
-        self.publisher_ = self.create_publisher(Float32, 'distance', 10)
+        if self.get_parameter('profile').get_parameter_value().string_value.lower() == 'reliable':
+            qos_profile = qos_profile_default
+        else:
+            qos_profile = qos_profile_sensor_data
+            qos_profile.depth = 1
+        self.publisher_ = self.create_publisher(Float32, 'distance', qos_profile)
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.callback)
 

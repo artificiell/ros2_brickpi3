@@ -1,6 +1,7 @@
 #!/usr/bin/env python3 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_default, qos_profile_sensor_data
 from std_msgs.msg import Int32
 
 import atexit
@@ -31,14 +32,14 @@ class MotorController(Node):
         self.limit = 1000
 
         # Setup ROS publisher
-        self.publisher_ = self.create_publisher(Int32, 'encoder', 10)
+        self.publisher_ = self.create_publisher(Int32, 'encoder', qos_profile_sensor_data)
 
         # Setup ROS subscriber
         self.subscription = self.create_subscription(
             Int32,
             'speed',
             self.speed_callback,
-            10
+            qos_profile_default
         )
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.encoder_callback)

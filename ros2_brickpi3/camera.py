@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy 
+from rclpy.qos import qos_profile_default, qos_profile_sensor_data 
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
 import subprocess
@@ -20,7 +20,7 @@ class RPiCamSensor(Node):
         self.declare_parameter('height', 480)
         self.declare_parameter('framerate', 30)
         self.declare_parameter('codec', 'mjpeg')
-        self.declare_parameter('policy', 'effort') # Reliability policy: effort or reliable
+        self.declare_parameter('profile', 'best_effort') # QoS profile: best_effort or reliable
 
         self.width = str(self.get_parameter('width').get_parameter_value().integer_value)
         self.height = str(self.get_parameter('height').get_parameter_value().integer_value)
@@ -28,22 +28,11 @@ class RPiCamSensor(Node):
         self.codec = self.get_parameter('codec').get_parameter_value().string_value
 
         # Set up ROS publiser(s)
-        policy = self.get_parameter('policy').get_parameter_value().string_value 
-        if policy.lower() == 'reliable':
-            self.get_logger().info(f"RPi Camera  QoS Profile: RELIABLE")
-            qos_profile = QoSProfile(
-                reliability = QoSReliabilityPolicy.RELIABLE,
-                history = QoSHistoryPolicy.KEEP_LAST,
-                depth = 10
-            )
-
+        if self.get_parameter('profile').get_parameter_value().string_value.lower() == 'reliable':
+            qos_profile = qos_profile_default
         else:
-            self.get_logger().info(f"RPi Camera  QoS Profile: BEST_EFFORT")
-            qos_profile = QoSProfile(
-                reliability = QoSReliabilityPolicy.BEST_EFFORT,
-                history = QoSHistoryPolicy.KEEP_LAST,
-                depth = 1
-            )
+            qos_profile = qos_profile_sensor_data
+            qos_profile.depth = 1
         self.image_pub = self.create_publisher(Image, 'camera/image', qos_profile)
         self.info_pub = self.create_publisher(CameraInfo, 'camera/info', qos_profile)
         self.bridge = CvBridge()
