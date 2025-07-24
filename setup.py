@@ -23,6 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            "camera = ros2_brickpi3.camera:main",
             "color = ros2_brickpi3.color:main",
             "drive = ros2_brickpi3.drive:main",
             "eyes = ros2_brickpi3.eyes:main",
