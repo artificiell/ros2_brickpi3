@@ -21,7 +21,7 @@ class EyesSensor(Node):
         # Declare port parameter
         self.declare_parameter('port', 1)
         self.declare_parameter('mode', 'short')
-        self.declare_parameter('profile', 'best_effort') # QoS profile: best_effort or reliable
+        self.declare_parameter('profile', 'reliable') # QoS profile: best_effort or reliable
         
         # Init BrickPi3 instance and set up sensor port
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.

@@ -15,6 +15,7 @@ class MotorController(Node):
 
         # Declare port parameter
         self.declare_parameter('port', 'A')
+        self.declare_parameter('profile', 'reliable') # QoS profile: best_effort or reliable
 
         # Init BrickPi3 and set up motor port
         self.brick = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class.
@@ -32,7 +33,12 @@ class MotorController(Node):
         self.limit = 1000
 
         # Setup ROS publisher
-        self.publisher_ = self.create_publisher(Int32, 'encoder', qos_profile_sensor_data)
+        if self.get_parameter('profile').get_parameter_value().string_value.lower() == 'reliable':
+            qos_profile = qos_profile_default
+        else:
+            qos_profile = qos_profile_sensor_data
+            qos_profile.depth = 1
+        self.publisher_ = self.create_publisher(Int32, 'encoder', qos_profile)
 
         # Setup ROS subscriber
         self.subscription = self.create_subscription(

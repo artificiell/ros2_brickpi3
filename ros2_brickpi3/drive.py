@@ -17,14 +17,22 @@ class DifferentialDrive(Node):
         # Declare robot parameters
         self.declare_parameter('wheel_radius', 0.0275)
         self.declare_parameter('base_distance', 0.075)
+        self.declare_parameter('profile', 'reliable') # QoS profile: best_effort or reliable
+
+        # Get wheel configuration
         self.r = self.get_parameter('wheel_radius').value
         self.b = self.get_parameter('base_distance').value
         self.ticks_per_meter = 1.0 / (2 * np.pi * self.r) * 360
         
         # Setup ROS publishers
+        if self.get_parameter('profile').get_parameter_value().string_value.lower() == 'reliable':
+            qos_profile = qos_profile_default
+        else:
+            qos_profile = qos_profile_sensor_data
+            qos_profile.depth = 1
         self.left_motor_publisher_ = self.create_publisher(Int32, 'left/speed', qos_profile_default)
         self.right_motor_publisher_ = self.create_publisher(Int32, 'right/speed', qos_profile_default)
-        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
+        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', qos_profile)
 
         # Setup ROS subscribers
         self.cmd_subscription = self.create_subscription(
@@ -37,13 +45,13 @@ class DifferentialDrive(Node):
             Int32,
             'left/encoder',
             self.left_encoder_callback,
-            qos_profile_sensor_data
+            qos_profile
         )
         self.right_encoder_subscription = self.create_subscription(
             Int32,
             'right/encoder',
             self.right_encoder_callback,
-            qos_profile_sensor_data
+            qos_profile
         )
 
         # Encoder and position variables
